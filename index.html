@@ -4,50 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WiggleGram Generator</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Gifshot Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gifshot/0.3.2/gifshot.min.js"></script>
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        .drop-zone {
-            transition: all 0.2s ease-in-out;
-        }
-        .drop-zone.dragover {
-            border-color: #3b82f6;
-            background-color: #eff6ff;
-        }
-        .hide-scroll::-webkit-scrollbar {
-            height: 6px;
-        }
-        .hide-scroll::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
-            border-radius: 4px;
-        }
-        /* Play Button Overlay */
-        .play-overlay {
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(2px);
-            transition: opacity 0.2s;
-        }
-        /* Range Slider Styling */
-        input[type=range] {
-            accent-color: #7c3aed;
-        }
+        .drop-zone { transition: all 0.2s ease-in-out; }
+        .drop-zone.dragover { border-color: #3b82f6; background-color: #eff6ff; }
+        .hide-scroll::-webkit-scrollbar { height: 6px; }
+        .hide-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+        .play-overlay { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(2px); transition: opacity 0.2s; }
+        input[type=range] { accent-color: #7c3aed; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-20">
 
     <div class="max-w-5xl mx-auto px-4 py-10">
         
-        <!-- Header -->
-        <header class="text-center mb-10">
+        <header class="text-center mb-6">
             <h1 class="text-4xl font-bold text-slate-900 mb-2">WiggleGram Generator</h1>
             <p class="text-slate-500">Split an image into thirds with custom framing and adjustable loop speeds.</p>
         </header>
 
-        <!-- Upload Section -->
+        <div id="resetContainer" class="hidden text-center mb-8">
+            <button id="resetBtn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-2 rounded-full font-bold flex items-center gap-2 mx-auto transition-all shadow-sm">
+                <i data-lucide="plus-circle" class="w-5 h-5"></i> New Upload
+            </button>
+        </div>
+
         <div id="dropZone" class="drop-zone bg-white border-2 border-dashed border-slate-300 rounded-2xl p-10 text-center cursor-pointer hover:border-blue-400 hover:shadow-lg mb-12">
             <input type="file" id="fileInput" accept="image/*" class="hidden">
             <div class="flex flex-col items-center justify-center space-y-4 pointer-events-none">
@@ -61,7 +44,6 @@
             </div>
         </div>
 
-        <!-- Settings Section (Always visible, collapsible) -->
         <div id="settingsPanel" class="bg-white rounded-2xl shadow-sm border border-slate-200 mb-8">
             <button id="settingsToggle" class="w-full p-6 flex items-center justify-between hover:bg-slate-50 transition-colors">
                 <h2 class="text-lg font-bold flex items-center gap-2">
@@ -73,56 +55,45 @@
             <div id="settingsContent" class="hidden border-t border-slate-100">
                 <div class="p-6">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <!-- Left Cut Line -->
                         <div class="space-y-3">
                             <div class="flex justify-between">
                                 <label class="text-sm font-semibold text-slate-600">Left Cut Line</label>
                                 <span id="leftCutVal" class="text-xs font-mono text-slate-400">33%</span>
                             </div>
                             <input type="range" id="leftCutInput" min="10" max="45" value="33" class="w-full">
-                            <p class="text-[10px] text-slate-400">Position of the first vertical divider.</p>
                         </div>
-                        <!-- Right Cut Line -->
                         <div class="space-y-3">
                             <div class="flex justify-between">
                                 <label class="text-sm font-semibold text-slate-600">Right Cut Line</label>
                                 <span id="rightCutVal" class="text-xs font-mono text-slate-400">67%</span>
                             </div>
                             <input type="range" id="rightCutInput" min="55" max="90" value="67" class="w-full">
-                            <p class="text-[10px] text-slate-400">Position of the second vertical divider.</p>
                         </div>
-                        <!-- Speed -->
                         <div class="space-y-3">
                             <div class="flex justify-between">
                                 <label class="text-sm font-semibold text-slate-600">Loop Speed</label>
-                                <span id="speedVal" class="text-xs font-mono text-slate-400">0.3s</span>
+                                <span id="speedVal" class="text-xs font-mono text-slate-400">0.2s</span>
                             </div>
-                            <input type="range" id="speedInput" min="0.05" max="1.0" step="0.05" value="0.3" class="w-full">
-                            <p class="text-[10px] text-slate-400">Interval between frames in seconds.</p>
+                            <input type="range" id="speedInput" min="0.05" max="1.0" step="0.05" value="0.2" class="w-full">
                         </div>
                     </div>
                     <div class="mt-6 pt-4 border-t border-slate-100 flex justify-end">
                         <button id="applySettingsBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 shadow-sm">
-                            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Regenerate GIF
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Apply & Regenerate
                         </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Processing Indicator -->
         <div id="loading" class="hidden text-center py-12">
             <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent mb-4"></div>
             <p class="text-slate-600 font-medium">Rendering frames...</p>
         </div>
 
-        <!-- Error Message -->
         <div id="errorMessage" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-8 text-center"></div>
 
-        <!-- Results Section -->
         <div id="results" class="hidden space-y-12 mb-20">
-
-            <!-- Generated GIF -->
             <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <div class="p-6 border-b border-slate-100 flex justify-between items-center">
                     <h2 class="text-xl font-bold flex items-center gap-2">
@@ -150,7 +121,6 @@
                 </div>
             </section>
 
-            <!-- The 3 Slices -->
             <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <button id="slicesToggle" class="w-full p-6 flex items-center justify-between hover:bg-slate-50 transition-colors">
                     <h2 class="text-xl font-bold flex items-center gap-2">
@@ -161,60 +131,31 @@
                 </button>
                 <div id="slicesContent" class="hidden border-t border-slate-100">
                     <div class="p-6">
-                        <div class="flex justify-end mb-4">
-                            <button id="downloadAllBtn" class="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center gap-1">
-                                Download All Slices
-                            </button>
-                        </div>
-
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="slice-card bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col">
-                                <div class="bg-slate-100 rounded-lg mb-4 flex-grow flex items-center justify-center overflow-hidden h-64">
-                                    <img id="slice1" class="h-full object-contain" alt="Left Slice">
+                            <div class="slice-card bg-white p-4 rounded-xl border border-slate-200 flex flex-col h-80">
+                                <div class="bg-slate-100 rounded-lg mb-4 flex-grow flex items-center justify-center overflow-hidden">
+                                    <img id="slice1" class="h-full object-contain" alt="Left">
                                 </div>
-                                <div class="flex justify-between items-center mt-auto">
-                                    <span class="text-sm font-medium text-slate-500">Part 1 (Left)</span>
-                                    <a id="dlSlice1" download="slice_1.png" class="p-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors" title="Download">
-                                        <i data-lucide="download" class="w-4 h-4"></i>
-                                    </a>
-                                </div>
+                                <div class="flex justify-between items-center"><span class="text-xs font-bold text-slate-400">PART 1</span><a id="dlSlice1" download="slice_1.png" class="p-2 hover:bg-slate-100 rounded-lg text-slate-600"><i data-lucide="download" class="w-4 h-4"></i></a></div>
                             </div>
-                            <div class="slice-card bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col">
-                                <div class="bg-slate-100 rounded-lg mb-4 flex-grow flex items-center justify-center overflow-hidden h-64">
-                                    <img id="slice2" class="h-full object-contain" alt="Middle Slice">
+                            <div class="slice-card bg-white p-4 rounded-xl border border-slate-200 flex flex-col h-80">
+                                <div class="bg-slate-100 rounded-lg mb-4 flex-grow flex items-center justify-center overflow-hidden">
+                                    <img id="slice2" class="h-full object-contain" alt="Center">
                                 </div>
-                                <div class="flex justify-between items-center mt-auto">
-                                    <span class="text-sm font-medium text-slate-500">Part 2 (Center)</span>
-                                    <a id="dlSlice2" download="slice_2.png" class="p-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors" title="Download">
-                                        <i data-lucide="download" class="w-4 h-4"></i>
-                                    </a>
-                                </div>
+                                <div class="flex justify-between items-center"><span class="text-xs font-bold text-slate-400">PART 2</span><a id="dlSlice2" download="slice_2.png" class="p-2 hover:bg-slate-100 rounded-lg text-slate-600"><i data-lucide="download" class="w-4 h-4"></i></a></div>
                             </div>
-                            <div class="slice-card bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col">
-                                <div class="bg-slate-100 rounded-lg mb-4 flex-grow flex items-center justify-center overflow-hidden h-64">
-                                    <img id="slice3" class="h-full object-contain" alt="Right Slice">
+                            <div class="slice-card bg-white p-4 rounded-xl border border-slate-200 flex flex-col h-80">
+                                <div class="bg-slate-100 rounded-lg mb-4 flex-grow flex items-center justify-center overflow-hidden">
+                                    <img id="slice3" class="h-full object-contain" alt="Right">
                                 </div>
-                                <div class="flex justify-between items-center mt-auto">
-                                    <span class="text-sm font-medium text-slate-500">Part 3 (Right)</span>
-                                    <a id="dlSlice3" download="slice_3.png" class="p-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors" title="Download">
-                                        <i data-lucide="download" class="w-4 h-4"></i>
-                                    </a>
-                                </div>
+                                <div class="flex justify-between items-center"><span class="text-xs font-bold text-slate-400">PART 3</span><a id="dlSlice3" download="slice_3.png" class="p-2 hover:bg-slate-100 rounded-lg text-slate-600"><i data-lucide="download" class="w-4 h-4"></i></a></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
         </div>
-        
-        <!-- Reset Button -->
-        <div id="resetContainer" class="hidden text-center mb-20">
-            <button id="resetBtn" class="text-slate-500 hover:text-slate-800 font-medium flex items-center gap-2 mx-auto transition-colors">
-                <i data-lucide="rotate-ccw" class="w-4 h-4"></i> New Upload
-            </button>
-        </div>
 
-        <!-- History Section -->
         <div id="historySection" class="hidden border-t border-slate-200 pt-10">
              <div class="flex items-center justify-between mb-6">
                 <h2 class="text-2xl font-bold flex items-center gap-2 text-slate-800">
@@ -223,37 +164,64 @@
                 </h2>
                 <button id="clearHistoryBtn" class="text-red-500 hover:text-red-700 text-sm font-medium">Clear History</button>
             </div>
-            <div id="historyList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <!-- History Items Injected Here -->
-            </div>
+            <div id="historyList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
         </div>
-
     </div>
 
-    <!-- Logic -->
     <script>
-        // --- 1. DB & Storage Logic ---
         const DB_NAME = 'SplitLoopDB';
         const DB_VERSION = 1;
         const STORE_NAME = 'history';
         let db;
 
+        // --- Logic Initialization ---
+        lucide.createIcons();
+        initDB();
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+        const resetContainer = document.getElementById('resetContainer');
+        const resetBtn = document.getElementById('resetBtn');
+        const applySettingsBtn = document.getElementById('applySettingsBtn');
+        const errorMsg = document.getElementById('errorMessage');
+        const finalGif = document.getElementById('finalGif');
+        const gifContainer = document.getElementById('gifContainer');
+        const gifPlayOverlay = document.getElementById('gifPlayOverlay');
+        const historyList = document.getElementById('historyList');
+        const historySection = document.getElementById('historySection');
+        const sliceImgs = [document.getElementById('slice1'), document.getElementById('slice2'), document.getElementById('slice3')];
+        const sliceLinks = [document.getElementById('dlSlice1'), document.getElementById('dlSlice2'), document.getElementById('dlSlice3')];
+
+        const leftCutInput = document.getElementById('leftCutInput');
+        const rightCutInput = document.getElementById('rightCutInput');
+        const speedInput = document.getElementById('speedInput');
+        const leftCutVal = document.getElementById('leftCutVal');
+        const rightCutVal = document.getElementById('rightCutVal');
+        const speedVal = document.getElementById('speedVal');
+        
+        const settingsToggle = document.getElementById('settingsToggle');
+        const settingsContent = document.getElementById('settingsContent');
+        const settingsChevron = document.getElementById('settingsChevron');
+        const slicesToggle = document.getElementById('slicesToggle');
+        const slicesContent = document.getElementById('slicesContent');
+        const slicesChevron = document.getElementById('slicesChevron');
+
+        let originalImage = null;
+        let generatedGifBlob = null;
+        let generatedStaticBlob = null;
+        let isGifPlaying = false;
+        let currentObjectUrls = [];
+
+        // --- DB functions ---
         function initDB() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open(DB_NAME, DB_VERSION);
-                request.onupgradeneeded = (event) => {
-                    const db = event.target.result;
-                    if (!db.objectStoreNames.contains(STORE_NAME)) {
-                        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-                    }
-                };
-                request.onsuccess = (event) => {
-                    db = event.target.result;
-                    loadHistory();
-                    resolve(db);
-                };
-                request.onerror = (event) => reject(event.target.error);
-            });
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            request.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+            };
+            request.onsuccess = (e) => { db = e.target.result; loadHistory(); };
         }
 
         async function saveToHistory(gifBlob, staticBlob, sliceBlobs) {
@@ -262,9 +230,7 @@
             const item = {
                 id: Date.now(),
                 date: timestamp.toLocaleDateString() + ' ' + timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                gifBlob: gifBlob,
-                staticBlob: staticBlob,
-                sliceBlobs: sliceBlobs
+                gifBlob, staticBlob, sliceBlobs
             };
             const transaction = db.transaction([STORE_NAME], 'readwrite');
             transaction.objectStore(STORE_NAME).add(item);
@@ -281,222 +247,108 @@
         }
 
         function deleteHistoryItem(id) {
-            const transaction = db.transaction([STORE_NAME], 'readwrite');
-            transaction.objectStore(STORE_NAME).delete(id);
-            transaction.oncomplete = () => loadHistory();
+            db.transaction([STORE_NAME], 'readwrite').objectStore(STORE_NAME).delete(id).onsuccess = () => loadHistory();
         }
-
-        function clearHistory() {
-            const transaction = db.transaction([STORE_NAME], 'readwrite');
-            transaction.objectStore(STORE_NAME).clear();
-            transaction.oncomplete = () => loadHistory();
-        }
-
-        // --- 2. UI & Interaction Logic ---
-        lucide.createIcons();
-        initDB();
-
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
-        const loading = document.getElementById('loading');
-        const results = document.getElementById('results');
-        const resetContainer = document.getElementById('resetContainer');
-        const resetBtn = document.getElementById('resetBtn');
-        const settingsPanel = document.getElementById('settingsPanel');
-        const applySettingsBtn = document.getElementById('applySettingsBtn');
-        const errorMsg = document.getElementById('errorMessage');
-        const finalGif = document.getElementById('finalGif');
-        const gifContainer = document.getElementById('gifContainer');
-        const gifPlayOverlay = document.getElementById('gifPlayOverlay');
-        const historyList = document.getElementById('historyList');
-        const historySection = document.getElementById('historySection');
-        const sliceImgs = [document.getElementById('slice1'), document.getElementById('slice2'), document.getElementById('slice3')];
-        const sliceLinks = [document.getElementById('dlSlice1'), document.getElementById('dlSlice2'), document.getElementById('dlSlice3')];
-
-        // Settings Inputs
-        const leftCutInput = document.getElementById('leftCutInput');
-        const rightCutInput = document.getElementById('rightCutInput');
-        const speedInput = document.getElementById('speedInput');
-        const leftCutVal = document.getElementById('leftCutVal');
-        const rightCutVal = document.getElementById('rightCutVal');
-        const speedVal = document.getElementById('speedVal');
-        
-        // Collapsible sections
-        const settingsToggle = document.getElementById('settingsToggle');
-        const settingsContent = document.getElementById('settingsContent');
-        const settingsChevron = document.getElementById('settingsChevron');
-        const slicesToggle = document.getElementById('slicesToggle');
-        const slicesContent = document.getElementById('slicesContent');
-        const slicesChevron = document.getElementById('slicesChevron');
-
-        let originalImage = null;
-        let generatedGifBlob = null;
-        let generatedStaticBlob = null;
-        let isGifPlaying = false;
-        let currentObjectUrls = [];
 
         // --- Event Listeners ---
+        settingsToggle.onclick = () => {
+            const isHidden = settingsContent.classList.toggle('hidden');
+            settingsChevron.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
+        };
         
-        // Toggle settings panel
-        settingsToggle.addEventListener('click', () => {
-            const isHidden = settingsContent.classList.contains('hidden');
-            settingsContent.classList.toggle('hidden');
-            settingsChevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
-            lucide.createIcons();
-        });
+        slicesToggle.onclick = () => {
+            const isHidden = slicesContent.classList.toggle('hidden');
+            slicesChevron.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
+        };
+
+        dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('dragover'); };
+        dropZone.ondragleave = () => dropZone.classList.remove('dragover');
+        dropZone.ondrop = (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); handleFile(e.dataTransfer.files[0]); };
+        dropZone.onclick = () => fileInput.click();
+        fileInput.onchange = (e) => handleFile(e.target.files[0]);
         
-        // Toggle slices panel
-        slicesToggle.addEventListener('click', () => {
-            const isHidden = slicesContent.classList.contains('hidden');
-            slicesContent.classList.toggle('hidden');
-            slicesChevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
-            lucide.createIcons();
-        });
+        resetBtn.onclick = () => { originalImage = null; resetView(); };
 
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
-        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
-        });
-        dropZone.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleFile(e.target.files[0]); });
-        
-        resetBtn.addEventListener('click', () => {
-            originalImage = null;
-            resetView();
-        });
+        leftCutInput.oninput = () => leftCutVal.textContent = leftCutInput.value + '%';
+        rightCutInput.oninput = () => rightCutVal.textContent = rightCutInput.value + '%';
+        speedInput.oninput = () => speedVal.textContent = speedInput.value + 's';
 
-        // Update value indicators
-        leftCutInput.addEventListener('input', () => leftCutVal.textContent = leftCutInput.value + '%');
-        rightCutInput.addEventListener('input', () => rightCutVal.textContent = rightCutInput.value + '%');
-        speedInput.addEventListener('input', () => speedVal.textContent = speedInput.value + 's');
-
-        applySettingsBtn.addEventListener('click', () => {
+        applySettingsBtn.onclick = () => {
             if (originalImage) {
                 toggleLoading(true);
-                processImage(originalImage);
+                processImage(originalImage, false); // Pass false to NOT save to history on regen
             }
-        });
+        };
 
-        gifContainer.addEventListener('click', () => {
-            if (!generatedGifBlob || !generatedStaticBlob) return;
-            toggleMainGif(!isGifPlaying);
-        });
-
-        document.getElementById('downloadGifBtn').addEventListener('click', () => {
-            if (generatedGifBlob) downloadBlob(generatedGifBlob, 'wigglegram-animation.gif');
-        });
-
-        document.getElementById('openGifBtn').addEventListener('click', () => {
-            if (generatedGifBlob) window.open(URL.createObjectURL(generatedGifBlob), '_blank');
-        });
-
-        document.getElementById('downloadAllBtn').addEventListener('click', () => sliceLinks.forEach(link => link.click()));
-        document.getElementById('clearHistoryBtn').addEventListener('click', () => { if(confirm('Clear history?')) clearHistory(); });
+        gifContainer.onclick = () => toggleMainGif(!isGifPlaying);
+        document.getElementById('downloadGifBtn').onclick = () => { if (generatedGifBlob) downloadBlob(generatedGifBlob, 'wigglegram.gif'); };
+        document.getElementById('openGifBtn').onclick = () => { if (generatedGifBlob) window.open(URL.createObjectURL(generatedGifBlob)); };
+        document.getElementById('clearHistoryBtn').onclick = () => { if(confirm('Clear history?')) { db.transaction([STORE_NAME], 'readwrite').objectStore(STORE_NAME).clear(); loadHistory(); } };
 
         // --- Core Functions ---
-
         function handleFile(file) {
-            if (!file.type.startsWith('image/')) { showError('Please upload a valid image file.'); return; }
-            showError(null); 
-            toggleLoading(true);
+            if (!file || !file.type.startsWith('image/')) return;
+            showError(null); toggleLoading(true);
             const reader = new FileReader();
-            reader.onload = (event) => {
+            reader.onload = (e) => {
                 const img = new Image();
-                img.onload = () => {
-                    originalImage = img;
-                    processImage(img);
-                };
-                img.src = event.target.result;
+                img.onload = () => { originalImage = img; processImage(img, true); };
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
 
-        async function processImage(img) {
-            const leftCutPercent = parseFloat(leftCutInput.value) / 100;
-            const rightCutPercent = parseFloat(rightCutInput.value) / 100;
+        async function processImage(img, shouldSaveHistory = true) {
+            const leftCut = Math.floor(img.width * (leftCutInput.value / 100));
+            const rightCut = Math.floor(img.width * (rightCutInput.value / 100));
             const interval = parseFloat(speedInput.value);
 
-            const totalWidth = img.width;
-            const height = img.height;
-            
-            // Calculate the three slice widths based on cut positions
-            const leftCut = Math.floor(totalWidth * leftCutPercent);
-            const rightCut = Math.floor(totalWidth * rightCutPercent);
-            
-            const slice1Width = leftCut;
-            const slice2Width = rightCut - leftCut;
-            const slice3Width = totalWidth - rightCut;
+            const slices = [
+                { x: 0, w: leftCut },
+                { x: leftCut, w: rightCut - leftCut },
+                { x: rightCut, w: img.width - rightCut }
+            ];
 
             const sliceDataUrls = [];
             const tempSliceBlobs = [];
 
-            // Define the source regions for each slice with their actual widths
-            const sliceRegions = [
-                { x: 0, width: slice1Width },
-                { x: leftCut, width: slice2Width },
-                { x: rightCut, width: slice3Width }
-            ];
-
-            for (let i = 0; i < 3; i++) {
+            for (let s of slices) {
                 const canvas = document.createElement('canvas');
-                const region = sliceRegions[i];
-                
-                // Use the actual slice width (no padding)
-                canvas.width = region.width;
-                canvas.height = height;
+                canvas.width = s.w; canvas.height = img.height;
                 const ctx = canvas.getContext('2d');
-                
-                // Draw the slice at its actual size
-                ctx.drawImage(img, region.x, 0, region.width, height, 0, 0, region.width, height);
-                
+                ctx.drawImage(img, s.x, 0, s.w, img.height, 0, 0, s.w, img.height);
                 sliceDataUrls.push(canvas.toDataURL('image/png'));
-                await new Promise(resolve => canvas.toBlob(blob => { tempSliceBlobs.push(blob); resolve(); }, 'image/png'));
+                await new Promise(r => canvas.toBlob(b => { tempSliceBlobs.push(b); r(); }));
             }
 
-            // GIF Generation - use the widest slice for uniform frame size
-            const maxSliceWidth = Math.max(slice1Width, slice2Width, slice3Width);
-            let gifW = maxSliceWidth;
-            let gifH = height;
-            if (gifW > 600) { // Constraint for faster processing
-                const ratio = 600 / gifW;
-                gifW = 600;
-                gifH = height * ratio;
-            }
+            const maxW = Math.max(...slices.map(s => s.w));
+            let gifW = Math.min(maxW, 600);
+            let gifH = img.height * (gifW / maxW);
 
             gifshot.createGIF({
                 images: sliceDataUrls,
-                gifWidth: gifW,
-                gifHeight: gifH,
-                interval: interval,
-                numFrames: 3,
-            }, function(obj) {
-                if (!obj.error) {
-                    fetch(obj.image).then(res => res.blob()).then(blob => {
-                        const staticBlob = tempSliceBlobs[0];
-                        saveToHistory(blob, staticBlob, tempSliceBlobs);
-                        displayResults(blob, staticBlob, tempSliceBlobs, true);
-                    });
-                } else {
-                    showError('GIF generation failed.');
-                    toggleLoading(false);
-                }
+                gifWidth: gifW, gifHeight: gifH,
+                interval: interval, numFrames: 3
+            }, (obj) => {
+                if (obj.error) { showError('Failed.'); toggleLoading(false); return; }
+                fetch(obj.image).then(r => r.blob()).then(blob => {
+                    if (shouldSaveHistory) saveToHistory(blob, tempSliceBlobs[0], tempSliceBlobs);
+                    displayResults(blob, tempSliceBlobs[0], tempSliceBlobs, true);
+                });
             });
         }
 
-        function displayResults(gifBlob, staticBlob, sBlobs, startPlaying = false) {
-            currentObjectUrls.forEach(url => URL.revokeObjectURL(url));
+        function displayResults(gifBlob, staticBlob, sBlobs, startPlaying) {
+            currentObjectUrls.forEach(URL.revokeObjectURL);
             currentObjectUrls = [];
             generatedGifBlob = gifBlob;
             generatedStaticBlob = staticBlob;
             
-            sBlobs.forEach((blob, index) => {
+            sBlobs.forEach((blob, i) => {
                 const url = URL.createObjectURL(blob);
                 currentObjectUrls.push(url);
-                sliceImgs[index].src = url;
-                sliceLinks[index].href = url;
+                sliceImgs[i].src = url;
+                sliceLinks[i].href = url;
             });
 
             toggleMainGif(startPlaying);
@@ -508,56 +360,35 @@
 
         function toggleMainGif(play) {
             isGifPlaying = play;
-            if (play) {
-                const gifUrl = URL.createObjectURL(generatedGifBlob);
-                finalGif.src = gifUrl;
-                gifPlayOverlay.classList.add('opacity-0', 'pointer-events-none');
-            } else {
-                const staticUrl = URL.createObjectURL(generatedStaticBlob);
-                finalGif.src = staticUrl;
-                gifPlayOverlay.classList.remove('opacity-0', 'pointer-events-none');
-            }
+            const blob = play ? generatedGifBlob : generatedStaticBlob;
+            finalGif.src = URL.createObjectURL(blob);
+            gifPlayOverlay.classList.toggle('opacity-0', play);
+            gifPlayOverlay.classList.toggle('pointer-events-none', play);
         }
 
         function renderHistoryList(items) {
             historyList.innerHTML = '';
-            if (items.length === 0) { historySection.classList.add('hidden'); return; }
+            if (!items.length) { historySection.classList.add('hidden'); return; }
             historySection.classList.remove('hidden');
             items.forEach(item => {
-                const staticUrl = URL.createObjectURL(item.staticBlob);
-                const gifUrl = URL.createObjectURL(item.gifBlob);
                 const card = document.createElement('div');
-                card.className = "bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all";
+                card.className = "bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden";
                 card.innerHTML = `
-                    <div class="h-40 bg-slate-100 flex items-center justify-center overflow-hidden relative group cursor-pointer history-gif-container">
-                        <img src="${staticUrl}" class="h-full w-full object-cover history-img">
-                        <div class="history-play-overlay absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-all">
-                            <div class="bg-white/90 p-2 rounded-full shadow-lg">
-                                <i data-lucide="play" class="w-5 h-5 text-purple-600 fill-purple-600"></i>
-                            </div>
+                    <div class="h-32 bg-slate-100 flex items-center justify-center overflow-hidden cursor-pointer relative group">
+                        <img src="${URL.createObjectURL(item.staticBlob)}" class="h-full w-full object-cover">
+                        <div class="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/20 transition-all">
+                            <i data-lucide="play" class="w-5 h-5 text-white fill-white"></i>
                         </div>
                     </div>
-                    <div class="p-3">
-                        <p class="text-[10px] uppercase font-bold text-slate-400 mb-2">${item.date}</p>
-                        <div class="flex gap-2">
-                            <button class="view-btn flex-1 bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs py-2 rounded font-semibold transition-colors">View</button>
-                            <button class="delete-btn px-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                        </div>
+                    <div class="p-3 flex justify-between items-center">
+                        <button class="view-btn text-xs font-bold text-purple-600 hover:underline">RESTORE</button>
+                        <button class="del-btn text-slate-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                     </div>`;
-                const hImg = card.querySelector('.history-img');
-                const hOverlay = card.querySelector('.history-play-overlay');
-                let hPlaying = false;
-                card.querySelector('.history-gif-container').onclick = () => {
-                    hPlaying = !hPlaying;
-                    hImg.src = hPlaying ? gifUrl : staticUrl;
-                    hOverlay.classList.toggle('opacity-0', hPlaying);
-                };
-                card.querySelector('.view-btn').onclick = (e) => {
-                    e.stopPropagation();
+                card.querySelector('.view-btn').onclick = () => {
                     displayResults(item.gifBlob, item.staticBlob, item.sliceBlobs, false);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 };
-                card.querySelector('.delete-btn').onclick = (e) => { e.stopPropagation(); deleteHistoryItem(item.id); };
+                card.querySelector('.del-btn').onclick = () => deleteHistoryItem(item.id);
                 historyList.appendChild(card);
             });
             lucide.createIcons();
@@ -565,50 +396,26 @@
 
         function toggleLoading(isLoading) {
             loading.classList.toggle('hidden', !isLoading);
-            if (isLoading) {
-                results.classList.add('hidden');
-                resetContainer.classList.add('hidden');
-                dropZone.classList.add('hidden');
-            }
+            if (isLoading) { results.classList.add('hidden'); resetContainer.classList.add('hidden'); dropZone.classList.add('hidden'); }
         }
 
         function resetView() {
-            results.classList.add('hidden');
-            resetContainer.classList.add('hidden');
-            dropZone.classList.remove('hidden');
-            errorMsg.classList.add('hidden');
+            results.classList.add('hidden'); resetContainer.classList.add('hidden'); dropZone.classList.remove('hidden');
             fileInput.value = '';
-            // Reset sliders
-            leftCutInput.value = 33; leftCutVal.textContent = '33%';
-            rightCutInput.value = 67; rightCutVal.textContent = '67%';
-            speedInput.value = 0.3; speedVal.textContent = '0.3s';
-            // Collapse dropdowns
-            settingsContent.classList.add('hidden');
-            settingsChevron.style.transform = 'rotate(0deg)';
-            slicesContent.classList.add('hidden');
-            slicesChevron.style.transform = 'rotate(0deg)';
+            speedInput.value = 0.2; speedVal.textContent = '0.2s';
         }
 
         function showError(msg) {
-            if (msg) {
-                errorMsg.textContent = msg;
-                errorMsg.classList.remove('hidden');
-                toggleLoading(false);
-                dropZone.classList.remove('hidden');
-            } else {
-                errorMsg.classList.add('hidden');
-            }
+            errorMsg.textContent = msg || '';
+            errorMsg.classList.toggle('hidden', !msg);
+            if (msg) toggleLoading(false);
         }
 
         function downloadBlob(blob, filename) {
-            const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
+            a.href = URL.createObjectURL(blob);
             a.download = filename;
-            document.body.appendChild(a);
             a.click();
-            window.URL.revokeObjectURL(url);
         }
     </script>
 </body>
