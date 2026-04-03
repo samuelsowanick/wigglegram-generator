@@ -325,10 +325,19 @@
             let gifW = Math.min(maxW, 600);
             let gifH = img.height * (gifW / maxW);
 
+            // Create a custom sequence for the boomerang effect: Left, Middle, Right, Middle
+            const boomerangFrames = [
+                sliceDataUrls[0], // Left
+                sliceDataUrls[1], // Middle
+                sliceDataUrls[2], // Right
+                sliceDataUrls[1]  // Middle
+            ];
+
             gifshot.createGIF({
-                images: sliceDataUrls,
+                images: boomerangFrames, // Use the new 4-frame sequence
                 gifWidth: gifW, gifHeight: gifH,
-                interval: interval, numFrames: 3
+                interval: interval, 
+                numFrames: 4 // Updated from 3 to 4 frames
             }, (obj) => {
                 if (obj.error) { showError('Failed.'); toggleLoading(false); return; }
                 fetch(obj.image).then(r => r.blob()).then(blob => {
